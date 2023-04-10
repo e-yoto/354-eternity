@@ -7,6 +7,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import java.util.Locale;
+
 public class PrimaryController {
 
     @FXML
@@ -24,12 +26,13 @@ public class PrimaryController {
 
         try {
             Double result = eval(inputTextField.getText());
-            currentText.setText(inputTextField.getText()+" = ");
+            currentText.setText(inputTextField.getText()+ " = ");
             inputTextField.setText(String.valueOf(result).substring(0, Math.min(String.valueOf(result).length(), 21)));
             System.out.println("DEBUG: handleCalculateButtonAction() Calculation result: " + result);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
+            currentText.setText(input);
             input = "";
-            currentText.setText("");
             inputTextField.setText("ERROR");
             System.out.println("DEBUG: handleCalculateButtonAction() Exception");
         }
@@ -57,7 +60,11 @@ public class PrimaryController {
             double parse() {
                 nextChar();
                 double x = parseExpression();
-                if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char)ch);
+                if (pos < str.length())
+                {
+                    if ((char)ch != ',')
+                        throw new RuntimeException("Unexpected: " + (char)ch);
+                }
                 return x;
             }
 
@@ -95,7 +102,8 @@ public class PrimaryController {
                 if (eat('(')) { // parentheses
                     x = parseExpression();
                     eat(')');
-                } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
+                }
+                else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
                     while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
                     x = Double.parseDouble(str.substring(startPos, this.pos));
                 } else if (ch >= 'a' && ch <= 'z') { // functions
@@ -108,17 +116,36 @@ public class PrimaryController {
                     else if (func.equals("sinh")) x = Functions.sinh(x*Functions.DEGREES_TO_RADIANS);
                     else if (func.equals("arccos")) x = Functions.arccosine(x);
                     else if (func.equals("abs")) x = Functions.absVal(x);
-                    else if (func.equals("Std dev")) {
-                        System.out.println(input);
-                        int index = input.indexOf("Std dev(");
-                        System.out.println(index);
+                    else if (func.equals("stddev")) {
+                        int index = input.indexOf("stddev(") + 7;
+                        int endIndex = input.indexOf(")", index);
+                        String sub = input.substring(index,endIndex);
+                        String[] inputValues = sub.split(",");
+                        double[] doubleValues = new double[inputValues.length];
+                        for (int i = 0; i < inputValues.length; i++) {
+                            doubleValues[i] = Double.parseDouble(inputValues[i]);
+                        }
+                        x = Functions.standardDeviation(doubleValues);
+                        System.out.println("DEBUG: eval() parseFactor() stdev result: " + x);
+                        return x;
+                    }
+                    else if (func.equals("mad")){
+                        int index = input.indexOf("mad(") + 4;
+                        int endIndex = input.indexOf(")", index);
+                        String sub = input.substring(index,endIndex);
+                        String[] inputValues = sub.split(",");
+                        double[] doubleValues = new double[inputValues.length];
+                        for (int i = 0; i < inputValues.length; i++){
+                            doubleValues[i] = Double.parseDouble(inputValues[i]);
+                        }
+                        x = Functions.MAD(doubleValues);
+                        System.out.println("DEBUG: eval() parseFactor() MAD result: " + x);
+                        return x;
                     }
                     else throw new RuntimeException("Unknown function: " + func);
                 } else {
                     throw new RuntimeException("Unexpected: " + (char)ch);
                 }
-
-
                 return x;
             }
         }.parse();
@@ -141,7 +168,22 @@ public class PrimaryController {
 
     @FXML
     void handleStdDevButtonAction(ActionEvent event) {
-        buildOperation("Std Dev");
+        buildOperation("stddev(");
+    }
+
+    @FXML
+    void handleMadButtonAction(ActionEvent event) {
+        buildOperation("mad(");
+    }
+
+    @FXML
+    void handleArccosButtonAction(ActionEvent event) {
+        buildOperation("arccos(");
+    }
+
+    @FXML
+    void handleSinhxButtonAction(ActionEvent event) {
+        buildOperation("sinh(");
     }
 
     @FXML
@@ -299,15 +341,15 @@ public class PrimaryController {
                 break;
             case S:
                 if (!shiftPressed)
-                    appendNumber("sinh(");
+                    handleSinhxButtonAction(null);
                 else
-                    appendNumber("Std dev(");
+                    handleStdDevButtonAction(null);
                 break;
             case L:
                 appendNumber("log(");
                 break;
             case A:
-                appendNumber("arccos(");
+                handleArccosButtonAction(null);
                 break;
             case PERIOD:
                 handlePeriodButton(null);

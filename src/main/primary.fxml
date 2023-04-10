@@ -11,26 +11,26 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 
-<VBox fx:id="vbox" alignment="CENTER" prefHeight="500.0" prefWidth="450.0" spacing="20.0" style="-fx-background-color: #282828;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.PrimaryController">
+<VBox fx:id="vbox" alignment="CENTER" prefHeight="600.0" prefWidth="400.0" style="-fx-background-color: #282828;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.PrimaryController">
     <children>
         <StackPane prefHeight="150.0" prefWidth="200.0">
             <children>
                 <TextField fx:id="inputTextField" focusTraversable="false" mouseTransparent="true" prefHeight="91.0" prefWidth="308.0" promptText="Enter">
                     <font>
-                        <Font size="32.0" />
+                        <Font size="25.0" />
                     </font>
                     <StackPane.margin>
                         <Insets />
                     </StackPane.margin></TextField>
                 <Text fx:id="currentText" strokeType="OUTSIDE" strokeWidth="0.0" text=" " StackPane.alignment="TOP_LEFT">
                     <StackPane.margin>
-                        <Insets left="5.0" top="5.0" />
+                        <Insets left="5.0" top="18.0" />
                     </StackPane.margin></Text>
             </children>
         </StackPane>
-      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="251.0" spacing="20.0">
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="251.0" spacing="15.0">
          <children>
-            <Button fx:id="clearButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleClearButtonAction" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="C" textAlignment="RIGHT" textFill="#cd0f0f">
+            <Button fx:id="clearButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleClearButtonAction" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="C" textAlignment="RIGHT" textFill="#cd0f0f">
                <font>
                   <Font name="System Bold" size="15.0" />
                </font>
@@ -38,89 +38,143 @@
                   <Insets />
                </HBox.margin>
             </Button>
-            <Button fx:id="historyButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="History" textAlignment="RIGHT">
-               <font>
-                  <Font size="10.0" />
-               </font>
+            <Button fx:id="historyButton" mnemonicParsing="false" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="History" textAlignment="RIGHT">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </Button>
-            <Button fx:id="saveButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="Save" textAlignment="RIGHT">
-               <font>
-                  <Font size="10.0" />
-               </font>
+            <Button fx:id="saveButton" mnemonicParsing="false" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="Save" textAlignment="RIGHT">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
             </Button>
-            <Button fx:id="loadButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="Load" textAlignment="RIGHT">
-               <font>
-                  <Font size="10.0" />
-               </font>
+            <Button fx:id="loadButton" mnemonicParsing="false" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="Load" textAlignment="RIGHT">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
             </Button>
-            <Button fx:id="backspaceButton1111" mnemonicParsing="false" onAction="#handleBackspaceButtonAction" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="DEL" textAlignment="RIGHT">
-               <font>
-                  <Font size="10.0" />
-               </font>
+            <Button fx:id="backspaceButton1111" mnemonicParsing="false" onAction="#handleBackspaceButtonAction" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="DEL" textAlignment="RIGHT">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
             </Button>
          </children>
          <VBox.margin>
             <Insets />
          </VBox.margin>
       </HBox>
-        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="251.0" spacing="20.0">
+        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="251.0" spacing="15.0">
             <children>
-                <Button fx:id="exponentButton" mnemonicParsing="false" onAction="#handleExponentButtonAction" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="x^y" />
-                <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="ab^x" />
-                <Button fx:id="stdDevButton" mnemonicParsing="false" onAction="#handleStdDevButtonAction" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="Std. Dev">
-                    <font>
-                        <Font size="9.0" />
-                    </font></Button>
-                <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="arccos(x)">
-                    <font>
-                        <Font size="7.0" />
-                    </font></Button>
-                <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="sinh(x)">
-                    <font>
-                        <Font size="10.0" />
-                    </font>
+                <Button fx:id="exponentButton" mnemonicParsing="false" onAction="#handleExponentButtonAction" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="x^y">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button mnemonicParsing="false" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="ab^x">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="stdDevButton" mnemonicParsing="false" onAction="#handleStdDevButtonAction" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="Std. Dev">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="arccosButton" mnemonicParsing="false" onAction="#handleArccosButtonAction" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="arccos(x)">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="sinhxButton" mnemonicParsing="false" onAction="#handleSinhxButtonAction" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="sinh(x)">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
                 </Button>
             </children>
         </HBox>
-        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="251.0" spacing="20.0">
+        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="251.0" spacing="15.0">
             <children>
-                <Button fx:id="number7Button" mnemonicParsing="false" onAction="#handleButton7Action" prefHeight="50.0" prefWidth="50.0" text="7" />
-                <Button fx:id="number8Button" mnemonicParsing="false" onAction="#handleButton8Action" prefHeight="50.0" prefWidth="50.0" text="8" />
-                <Button fx:id="number9Button" mnemonicParsing="false" onAction="#handleButton9Action" prefHeight="50.0" prefWidth="50.0" text="9" />
-                <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="logb(x)">
-                    <font>
-                        <Font size="10.0" />
-                    </font></Button>
-                <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="MAD" />
+                <Button fx:id="number7Button" mnemonicParsing="false" onAction="#handleButton7Action" prefHeight="60.0" prefWidth="60.0" text="7">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="number8Button" mnemonicParsing="false" onAction="#handleButton8Action" prefHeight="60.0" prefWidth="60.0" text="8">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="number9Button" mnemonicParsing="false" onAction="#handleButton9Action" prefHeight="60.0" prefWidth="60.0" text="9">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button mnemonicParsing="false" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="logb(x)">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="madButton" mnemonicParsing="false" onAction="#handleMadButtonAction" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="MAD">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
             </children>
         </HBox>
-        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="251.0" spacing="20.0">
+        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="251.0" spacing="15.0">
             <children>
-                <Button fx:id="number4Button" mnemonicParsing="false" onAction="#handleButton4Action" prefHeight="50.0" prefWidth="50.0" text="4" />
-                <Button fx:id="number5Button" mnemonicParsing="false" onAction="#handleButton5Action" prefHeight="50.0" prefWidth="50.0" text="5" />
-                <Button fx:id="number6Button" mnemonicParsing="false" onAction="#handleButton6Action" prefHeight="50.0" prefWidth="50.0" text="6" />
-                <Button fx:id="multiplicationButton" mnemonicParsing="false" onAction="#handleMultButtonAction" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="x" />
-                <Button fx:id="divisionButton" mnemonicParsing="false" onAction="#handleDivisionButtonAction" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="/" />
+                <Button fx:id="number4Button" mnemonicParsing="false" onAction="#handleButton4Action" prefHeight="60.0" prefWidth="60.0" text="4">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="number5Button" mnemonicParsing="false" onAction="#handleButton5Action" prefHeight="60.0" prefWidth="60.0" text="5">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="number6Button" mnemonicParsing="false" onAction="#handleButton6Action" prefHeight="60.0" prefWidth="60.0" text="6">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="multiplicationButton" mnemonicParsing="false" onAction="#handleMultButtonAction" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="x">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="divisionButton" mnemonicParsing="false" onAction="#handleDivisionButtonAction" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="/">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
             </children>
         </HBox>
-        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="251.0" spacing="20.0">
+        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="251.0" spacing="15.0">
             <children>
-                <Button fx:id="number1Button" mnemonicParsing="false" onAction="#handleButton1Action" prefHeight="50.0" prefWidth="50.0" text="1" />
-                <Button fx:id="number2Button" mnemonicParsing="false" onAction="#handleButton2Action" prefHeight="50.0" prefWidth="50.0" text="2" />
-                <Button fx:id="number3Button" mnemonicParsing="false" onAction="#handleButton3Action" prefHeight="50.0" prefWidth="50.0" text="3" />
-                <Button fx:id="additionButton" mnemonicParsing="false" onAction="#handleAddButtonAction" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="+" />
-                <Button fx:id="substractionButton" mnemonicParsing="false" onAction="#handleSubButtonAction" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #a3a3c2;" text="-" />
+                <Button fx:id="number1Button" mnemonicParsing="false" onAction="#handleButton1Action" prefHeight="60.0" prefWidth="60.0" text="1">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="number2Button" mnemonicParsing="false" onAction="#handleButton2Action" prefHeight="60.0" prefWidth="60.0" text="2">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="number3Button" mnemonicParsing="false" onAction="#handleButton3Action" prefHeight="60.0" prefWidth="60.0" text="3">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="additionButton" mnemonicParsing="false" onAction="#handleAddButtonAction" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="+">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="substractionButton" mnemonicParsing="false" onAction="#handleSubButtonAction" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #a3a3c2;" text="-">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
             </children>
         </HBox>
-        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="251.0" spacing="20.0">
+        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="251.0" spacing="15.0">
             <children>
-                <Button fx:id="number0Button" mnemonicParsing="false" onAction="#handleButton0Action" prefHeight="50.0" prefWidth="50.0" text="0" />
-                <Button fx:id="periodButton" mnemonicParsing="false" onAction="#handlePeriodButton" prefHeight="50.0" prefWidth="50.0" text="." />
-                <Button fx:id="negationButton" mnemonicParsing="false" onAction="#handleNegationButton" prefHeight="50.0" prefWidth="50.0" text="(neg)" />
-                <Button fx:id="calculateButton" mnemonicParsing="false" onAction="#handleCalculateButtonAction" prefHeight="50.0" prefWidth="114.0" style="-fx-background-color: #80bfff;" text="=">
+                <Button fx:id="number0Button" mnemonicParsing="false" onAction="#handleButton0Action" prefHeight="60.0" prefWidth="60.0" text="0">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="periodButton" mnemonicParsing="false" onAction="#handlePeriodButton" prefHeight="60.0" prefWidth="60.0" text=".">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="negationButton" mnemonicParsing="false" onAction="#handleNegationButton" prefHeight="60.0" prefWidth="60.0" text="(neg)">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></Button>
+                <Button fx:id="calculateButton" mnemonicParsing="false" onAction="#handleCalculateButtonAction" prefHeight="60.0" prefWidth="134.0" style="-fx-background-color: #80bfff;" text="=">
                <font>
                   <Font name="System Bold Italic" size="19.0" />
                </font></Button>
