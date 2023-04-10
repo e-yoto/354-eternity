@@ -15,12 +15,7 @@ public class PrimaryController {
     private Text currentText;
     @FXML
     private VBox vbox;
-
-    // x + y, 'x' is firstValue, 'y' is secondValue, '+' is operation
-    private String firstValue = "";
-    private String secondValue = "";
-    private String operation;
-
+    private String input = "";
     private Boolean shiftPressed = false;
 
 
@@ -28,169 +23,227 @@ public class PrimaryController {
     private void handleCalculateButtonAction(ActionEvent event) {
 
         try {
-            switch (operation) {
-                case "^":
-                    double result = Functions.power(Double.parseDouble(firstValue), Double.parseDouble(secondValue));
-                    currentText.setText(firstValue + " ^ " + secondValue + " = ");
-                    inputTextField.setText(String.valueOf(result));
-                    break;
-                case "+":
-                    calculateAddition();
-                    break;
-                case "-":
-                    calculateSubtraction();
-                    break;
-                case "*":
-                    calculateMultiplication();
-                    break;
-                case "/":
-                    calculateDivision();
-                    break;
-                default:
-                    break;
-            }
+            Double result = eval(inputTextField.getText());
+            currentText.setText(inputTextField.getText()+" = ");
+            inputTextField.setText(String.valueOf(result).substring(0, Math.min(String.valueOf(result).length(), 21)));
+            System.out.println("DEBUG: handleCalculateButtonAction() Calculation result: " + result);
         } catch (Exception e) {
-            firstValue = "";
-            secondValue = "";
-            operation = "";
+            input = "";
             currentText.setText("");
             inputTextField.setText("ERROR");
-            System.out.println("DEBUG: handleCalculateButtonAction Exception");
+            System.out.println("DEBUG: handleCalculateButtonAction() Exception");
         }
+        input = "";
         cursorToEnd();
     }
 
+    public double eval(final String str) {
+        return new Object() {
+            int pos = -1, ch;
+
+            void nextChar() {
+                ch = (++pos < str.length()) ? str.charAt(pos) : -1;
+            }
+
+            boolean eat(int charToEat) {
+                while (ch == ' ') nextChar();
+                if (ch == charToEat) {
+                    nextChar();
+                    return true;
+                }
+                return false;
+            }
+
+            double parse() {
+                nextChar();
+                double x = parseExpression();
+                if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char)ch);
+                return x;
+            }
+
+            // Grammar:
+            // expression = term | expression `+` term | expression `-` term
+            // term = factor | term `*` factor | term `/` factor
+            // factor = `+` factor | `-` factor | `(` expression `)`
+            //        | number | functionName factor | factor `^` factor
+
+            double parseExpression() {
+                double x = parseTerm();
+                for (;;) {
+                    if      (eat('+')) x += parseTerm(); // addition
+                    else if (eat('-')) x -= parseTerm(); // subtraction
+                    else return x;
+                }
+            }
+
+            double parseTerm() {
+                double x = parseFactor();
+                for (;;) {
+                    if      (eat('*')) x *= parseFactor(); // multiplication
+                    else if (eat('/')) x /= parseFactor(); // division
+                    else if (eat('^')) x = Functions.power(x, parseFactor()); // exponentiation
+                    else return x;
+                }
+            }
+
+            double parseFactor() {
+                if (eat('+')) return parseFactor(); // unary plus
+                if (eat('-')) return -parseFactor(); // unary minus
+
+                double x;
+                int startPos = this.pos;
+                if (eat('(')) { // parentheses
+                    x = parseExpression();
+                    eat(')');
+                } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
+                    while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
+                    x = Double.parseDouble(str.substring(startPos, this.pos));
+                } else if (ch >= 'a' && ch <= 'z') { // functions
+                    while (ch >= 'a' && ch <= 'z') nextChar();
+                    String func = str.substring(startPos, this.pos);
+                    x = parseFactor();
+                    if (func.equals("sqrt")) x = Functions.squareRoot(x);
+                    else if (func.equals("log")) x = Functions.log(x);
+                    else if (func.equals("ln")) x = Functions.ln(x);
+                    else if (func.equals("sinh")) x = Functions.sinh(x*Functions.DEGREES_TO_RADIANS);
+                    else if (func.equals("arccos")) x = Functions.arccosine(x);
+                    else if (func.equals("abs")) x = Functions.absVal(x);
+                    else if (func.equals("Std dev")) {
+                        System.out.println(input);
+                        int index = input.indexOf("Std dev(");
+                        System.out.println(index);
+                    }
+                    else throw new RuntimeException("Unknown function: " + func);
+                } else {
+                    throw new RuntimeException("Unexpected: " + (char)ch);
+                }
+
+
+                return x;
+            }
+        }.parse();
+    }
+
     private void buildOperation(String operation) {
-        this.operation = operation;
-        firstValue = secondValue;
-        secondValue = "";
-        currentText.setText(firstValue + " " + operation);
+        appendNumber(operation);
     }
 
     public void appendNumber(String number) {
-        secondValue += number;
-        inputTextField.setText(secondValue);
+        input += number;
+        inputTextField.setText(input);
+        cursorToEnd();
     }
 
     @FXML
     void handleExponentButtonAction(ActionEvent event) {
         buildOperation("^");
-        cursorToEnd();
+    }
+
+    @FXML
+    void handleStdDevButtonAction(ActionEvent event) {
+        buildOperation("Std Dev");
     }
 
     @FXML
     void handleMultButtonAction(ActionEvent event) {
         buildOperation("*");
-        cursorToEnd();
     }
 
     @FXML
     void handleDivisionButtonAction(ActionEvent event) {
         buildOperation("/");
-        cursorToEnd();
     }
 
     @FXML
     void handleAddButtonAction(ActionEvent event) {
         buildOperation("+");
-        cursorToEnd();
     }
 
     @FXML
     void handleSubButtonAction(ActionEvent event) {
         buildOperation("-");
-        cursorToEnd();
-    }
-
-    private void calculateAddition() {
-        double result = Double.parseDouble(firstValue) + Double.parseDouble(secondValue);
-        currentText.setText(firstValue + " + " + secondValue + " = " + result);
-        inputTextField.setText(String.valueOf(result));
-    }
-
-    private void calculateSubtraction() {
-        double result = Double.parseDouble(firstValue) - Double.parseDouble(secondValue);
-        currentText.setText(firstValue + " - " + secondValue + " = " + result);
-        inputTextField.setText(String.valueOf(result));
-    }
-
-    private void calculateMultiplication() {
-        double result = Double.parseDouble(firstValue) * Double.parseDouble(secondValue);
-        currentText.setText(firstValue + " * " + secondValue + " = " + result);
-        inputTextField.setText(String.valueOf(result));
-    }
-
-    private void calculateDivision() {
-        double result = Double.parseDouble(firstValue) / Double.parseDouble(secondValue);
-        currentText.setText(firstValue + " / " + secondValue + " = " + result);
-        inputTextField.setText(String.valueOf(result));
     }
 
     @FXML
+    void handlePeriodButton(ActionEvent event) {
+        appendNumber(".");
+    }
+
+    @FXML
+    void handleNegationButton(ActionEvent event) {
+        input = "-"+input;
+    }
+    @FXML
     void handleButton0Action(ActionEvent event) {
         appendNumber("0");
-        cursorToEnd();
     }
 
     @FXML
     void handleButton1Action(ActionEvent event) {
         appendNumber("1");
-        cursorToEnd();
     }
 
     @FXML
     void handleButton2Action(ActionEvent event) {
         appendNumber("2");
-        cursorToEnd();
     }
 
     @FXML
     void handleButton3Action(ActionEvent event) {
         appendNumber("3");
-        cursorToEnd();
     }
 
     @FXML
     void handleButton4Action(ActionEvent event) {
         appendNumber("4");
-        cursorToEnd();
     }
 
     @FXML
     void handleButton5Action(ActionEvent event) {
         appendNumber("5");
-        cursorToEnd();
     }
 
     @FXML
     void handleButton6Action(ActionEvent event) {
         appendNumber("6");
-        vbox.requestFocus();
-        cursorToEnd();
     }
 
     @FXML
     void handleButton7Action(ActionEvent event) {
         appendNumber("7");
-        cursorToEnd();
     }
 
     @FXML
     void handleButton8Action(ActionEvent event) {
         appendNumber("8");
-        cursorToEnd();
     }
 
     @FXML
     void handleButton9Action(ActionEvent event) {
         appendNumber("9");
-        cursorToEnd();
+    }
+
+    @FXML
+    void handleClearButtonAction(ActionEvent event) {
+        reset();
+    }
+
+    @FXML
+    void handleBackspaceButtonAction(ActionEvent event) {
+        String temp = inputTextField.getText();
+        if (temp.length() != 0){
+            inputTextField.setText(temp.substring(0, temp.length() - 1));
+            input = temp.substring(0, temp.length() - 1);
+            System.out.println(input);
+        }
+    }
+
+    void updateInputTextBox(){
+
     }
 
     void reset(){
-        firstValue = "";
-        secondValue = "";
-        operation = "";
+        input = "";
         inputTextField.setText("");
     }
 
@@ -203,7 +256,10 @@ public class PrimaryController {
         System.out.println("check" + code.getName());
         switch (code) {
             case DIGIT0:
-                handleButton0Action(null);
+                if(shiftPressed)
+                    appendNumber(")");
+                else
+                    handleButton0Action(null);
                 break;
             case DIGIT1:
                 handleButton1Action(null);
@@ -230,10 +286,31 @@ public class PrimaryController {
                 handleButton7Action(null);
                 break;
             case DIGIT8:
-                handleButton8Action(null);
+                if(shiftPressed)
+                    appendNumber("*");
+                else
+                    handleButton8Action(null);
                 break;
             case DIGIT9:
-                handleButton9Action(null);
+                if (shiftPressed)
+                    appendNumber("(");
+                else
+                    handleButton9Action(null);
+                break;
+            case S:
+                if (!shiftPressed)
+                    appendNumber("sinh(");
+                else
+                    appendNumber("Std dev(");
+                break;
+            case L:
+                appendNumber("log(");
+                break;
+            case A:
+                appendNumber("arccos(");
+                break;
+            case PERIOD:
+                handlePeriodButton(null);
                 break;
             case EQUALS:
                 if (shiftPressed == true)
@@ -251,11 +328,17 @@ public class PrimaryController {
             case SHIFT:
                 setShiftPressed(true);
                 break;
+            case COMMA:
+                appendNumber(",");
+                break;
             case ESCAPE:
                 reset();
                 break;
             case ENTER:
                 handleCalculateButtonAction(null);
+                break;
+            case BACK_SPACE:
+                handleBackspaceButtonAction(null);
                 break;
             default:
                 break;

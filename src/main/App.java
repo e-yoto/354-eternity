@@ -18,10 +18,6 @@ public class App extends Application {
     private static Scene scene;
     PrimaryController controller;
 
-    @FXML
-    private TextField inputTextField;
-
-
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("primary.fxml"));
@@ -40,6 +36,7 @@ public class App extends Application {
         scene.setOnKeyReleased(e -> {
             controller.setShiftPressed(false);
         });
+        stage.setResizable(false);
         stage.setTitle("ETERNITY by Team B");
         stage.show();
 
