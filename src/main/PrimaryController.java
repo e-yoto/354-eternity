@@ -8,6 +8,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.util.Locale;
+import java.util.function.Function;
 
 public class PrimaryController {
 
@@ -19,22 +20,22 @@ public class PrimaryController {
     private VBox vbox;
     private String input = "";
     private Boolean shiftPressed = false;
-
+    private Double ans;
 
     @FXML
     private void handleCalculateButtonAction(ActionEvent event) {
 
         try {
             Double result = eval(inputTextField.getText());
-            currentText.setText(inputTextField.getText()+ " = ");
+            ans = result;
+            currentText.setText(inputTextField.getText() + " = ");
             inputTextField.setText(String.valueOf(result).substring(0, Math.min(String.valueOf(result).length(), 21)));
             System.out.println("DEBUG: handleCalculateButtonAction() Calculation result: " + result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             currentText.setText(input);
             input = "";
             inputTextField.setText("ERROR");
-            System.out.println("DEBUG: handleCalculateButtonAction() Exception");
+            System.out.println("DEBUG: handleCalculateButtonAction() Exception " + e.getMessage());
         }
         input = "";
         cursorToEnd();
@@ -49,7 +50,8 @@ public class PrimaryController {
             }
 
             boolean eat(int charToEat) {
-                while (ch == ' ') nextChar();
+                while (ch == ' ')
+                    nextChar();
                 if (ch == charToEat) {
                     nextChar();
                     return true;
@@ -60,10 +62,9 @@ public class PrimaryController {
             double parse() {
                 nextChar();
                 double x = parseExpression();
-                if (pos < str.length())
-                {
-                    if ((char)ch != ',')
-                        throw new RuntimeException("Unexpected: " + (char)ch);
+                if (pos < str.length()) {
+                    if ((char) ch != ',')
+                        throw new RuntimeException("DEBUG: eval() parse() Unexpected: " + (char) ch);
                 }
                 return x;
             }
@@ -72,83 +73,106 @@ public class PrimaryController {
             // expression = term | expression `+` term | expression `-` term
             // term = factor | term `*` factor | term `/` factor
             // factor = `+` factor | `-` factor | `(` expression `)`
-            //        | number | functionName factor | factor `^` factor
+            // | number | functionName factor | factor `^` factor
 
             double parseExpression() {
                 double x = parseTerm();
                 for (;;) {
-                    if      (eat('+')) x += parseTerm(); // addition
-                    else if (eat('-')) x -= parseTerm(); // subtraction
-                    else return x;
+                    if (eat('+'))
+                        x += parseTerm(); // addition
+                    else if (eat('-'))
+                        x -= parseTerm(); // subtraction
+                    else
+                        return x;
                 }
             }
 
             double parseTerm() {
                 double x = parseFactor();
                 for (;;) {
-                    if      (eat('*')) x *= parseFactor(); // multiplication
-                    else if (eat('/')) x /= parseFactor(); // division
-                    else if (eat('^')) x = Functions.power(x, parseFactor()); // exponentiation
-                    else return x;
+                    if (eat('*'))
+                        x *= parseFactor(); // multiplication
+                    else if (eat('/'))
+                        x /= parseFactor(); // division
+                    else if (eat('^'))
+                        x = Functions.power(x, parseFactor()); // exponentiation
+                    else
+                        return x;
                 }
             }
 
             double parseFactor() {
-                if (eat('+')) return parseFactor(); // unary plus
-                if (eat('-')) return -parseFactor(); // unary minus
+                if (eat('+'))
+                    return parseFactor(); // unary plus
+                if (eat('-'))
+                    return -parseFactor(); // unary minus
 
                 double x;
                 int startPos = this.pos;
                 if (eat('(')) { // parentheses
                     x = parseExpression();
                     eat(')');
-                }
-                else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
-                    while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
+                } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
+                    while ((ch >= '0' && ch <= '9') || ch == '.')
+                        nextChar();
                     x = Double.parseDouble(str.substring(startPos, this.pos));
                 } else if (ch >= 'a' && ch <= 'z') { // functions
-                    while (ch >= 'a' && ch <= 'z') nextChar();
+                    while (ch >= 'a' && ch <= 'z')
+                        nextChar();
                     String func = str.substring(startPos, this.pos);
                     x = parseFactor();
-                    if (func.equals("sqrt")) x = Functions.squareRoot(x);
-                    else if (func.equals("log")) x = Functions.log(x);
-                    else if (func.equals("ln")) x = Functions.ln(x);
-                    else if (func.equals("sinh")) x = Functions.sinh(x*Functions.DEGREES_TO_RADIANS);
-                    else if (func.equals("arccos")) x = Functions.arccosine(x);
-                    else if (func.equals("abs")) x = Functions.absVal(x);
+                    if (func.equals("sqrt"))
+                        x = Functions.squareRoot(x);
+                    else if (func.equals("log")) {
+                        int index = input.indexOf("log") + 4;
+                        double[] doubleValues = getValueArray(index);
+                        System.out.println("SSSSSSSSS" + doubleValues.length);
+                        if (doubleValues.length == 1)
+                            x = Functions.log(x);
+                        else
+                            x = Functions.log(doubleValues[1], doubleValues[0]);
+
+                        System.out.println("DEBUG: eval() parseFactor() log result: " + x);
+                    } else if (func.equals("ln"))
+                        x = Functions.ln(x);
+                    else if (func.equals("sinh"))
+                        x = Functions.sinh(x * Functions.DEGREES_TO_RADIANS);
+                    else if (func.equals("arccos"))
+                        x = Functions.arccosine(x);
+                    else if (func.equals("abs"))
+                        x = Functions.absVal(x);
                     else if (func.equals("stddev")) {
                         int index = input.indexOf("stddev(") + 7;
-                        int endIndex = input.indexOf(")", index);
-                        String sub = input.substring(index,endIndex);
-                        String[] inputValues = sub.split(",");
-                        double[] doubleValues = new double[inputValues.length];
-                        for (int i = 0; i < inputValues.length; i++) {
-                            doubleValues[i] = Double.parseDouble(inputValues[i]);
-                        }
+                        double[] doubleValues = getValueArray(index);
                         x = Functions.standardDeviation(doubleValues);
                         System.out.println("DEBUG: eval() parseFactor() stdev result: " + x);
                         return x;
-                    }
-                    else if (func.equals("mad")){
+                    } else if (func.equals("mad")) {
                         int index = input.indexOf("mad(") + 4;
-                        int endIndex = input.indexOf(")", index);
-                        String sub = input.substring(index,endIndex);
-                        String[] inputValues = sub.split(",");
-                        double[] doubleValues = new double[inputValues.length];
-                        for (int i = 0; i < inputValues.length; i++){
-                            doubleValues[i] = Double.parseDouble(inputValues[i]);
-                        }
+                        double[] doubleValues = getValueArray(index);
                         x = Functions.MAD(doubleValues);
                         System.out.println("DEBUG: eval() parseFactor() MAD result: " + x);
                         return x;
-                    }
-                    else throw new RuntimeException("Unknown function: " + func);
+                    } else
+                        throw new RuntimeException("DEBUG: eval() parseFactor() Unknown function: " + func);
                 } else {
-                    throw new RuntimeException("Unexpected: " + (char)ch);
+                    throw new RuntimeException("DEBUG: eval() parseFactor() Unexpected: " + (char) ch);
                 }
                 return x;
             }
         }.parse();
+    }
+
+    private double[] getValueArray(int index) {
+        int endIndex = input.indexOf(")", index);
+        String sub = input.substring(index, endIndex);
+        String[] inputValues = sub.split(",");
+        double[] doubleValues = new double[inputValues.length];
+        for (int i = 0; i < inputValues.length; i++) {
+            System.out.println("augh" + inputValues[i]);
+            doubleValues[i] = Double.parseDouble(inputValues[i]);
+        }
+        return doubleValues;
     }
 
     private void buildOperation(String operation) {
@@ -164,6 +188,11 @@ public class PrimaryController {
     @FXML
     void handleExponentButtonAction(ActionEvent event) {
         buildOperation("^");
+    }
+
+    @FXML
+    void handleLogBaseButtonAction(ActionEvent event) {
+        buildOperation("log(");
     }
 
     @FXML
@@ -212,9 +241,21 @@ public class PrimaryController {
     }
 
     @FXML
-    void handleNegationButton(ActionEvent event) {
-        input = "-"+input;
+    void handleAnsButton(ActionEvent event) {
+        if (ans != null)
+            appendNumber(String.valueOf(ans));
     }
+
+    @FXML
+    void handleLeftParanthButtonAction(ActionEvent event) {
+        appendNumber("(");
+    }
+
+    @FXML
+    void handleRightParanthButtonAction(ActionEvent event) {
+        appendNumber(")");
+    }
+
     @FXML
     void handleButton0Action(ActionEvent event) {
         appendNumber("0");
@@ -273,33 +314,33 @@ public class PrimaryController {
     @FXML
     void handleBackspaceButtonAction(ActionEvent event) {
         String temp = inputTextField.getText();
-        if (temp.length() != 0){
+        if (temp.length() != 0) {
             inputTextField.setText(temp.substring(0, temp.length() - 1));
             input = temp.substring(0, temp.length() - 1);
             System.out.println(input);
         }
     }
 
-    void updateInputTextBox(){
+    void updateInputTextBox() {
 
     }
 
-    void reset(){
+    void reset() {
         input = "";
         inputTextField.setText("");
     }
 
-    public void cursorToEnd(){
+    public void cursorToEnd() {
         vbox.requestFocus();
         inputTextField.positionCaret(inputTextField.getLength());
     }
 
-    public void checkKeyPresses(KeyCode code){
-        System.out.println("check" + code.getName());
+    public void checkKeyPresses(KeyCode code) {
+        System.out.println("DEBUG: checkKeyPresses() key pressed: " + code.getName());
         switch (code) {
             case DIGIT0:
-                if(shiftPressed)
-                    appendNumber(")");
+                if (shiftPressed)
+                    handleRightParanthButtonAction(null);
                 else
                     handleButton0Action(null);
                 break;
@@ -328,14 +369,14 @@ public class PrimaryController {
                 handleButton7Action(null);
                 break;
             case DIGIT8:
-                if(shiftPressed)
+                if (shiftPressed)
                     appendNumber("*");
                 else
                     handleButton8Action(null);
                 break;
             case DIGIT9:
                 if (shiftPressed)
-                    appendNumber("(");
+                    handleLeftParanthButtonAction(null);
                 else
                     handleButton9Action(null);
                 break;
@@ -346,7 +387,7 @@ public class PrimaryController {
                     handleStdDevButtonAction(null);
                 break;
             case L:
-                appendNumber("log(");
+                handleLogBaseButtonAction(null);
                 break;
             case A:
                 handleArccosButtonAction(null);
@@ -384,12 +425,12 @@ public class PrimaryController {
                 break;
             default:
                 break;
-        };
+        }
+        ;
     }
 
-    void setShiftPressed(Boolean value){
+    void setShiftPressed(Boolean value) {
         shiftPressed = value;
     }
-
 
 }
